@@ -10,7 +10,7 @@ module.exports = merge(common, {
     host: '0.0.0.0',
     hot: true,
     inline: true,
-    port: 3108,
+    port: 3602,
     publicPath: '/'
   },
   plugins: [new webpack.HotModuleReplacementPlugin()]

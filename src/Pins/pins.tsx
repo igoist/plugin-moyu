@@ -3,17 +3,29 @@ import * as React from 'react';
 const { useState, useEffect } = React;
 
 interface PinProps {
-  id: number,
-  top: number,
-  left: number,
-  height: number,
-  bgColor: string,
+  id: number;
+  top: number;
+  left: number;
+  height: number;
+  bgColor: string;
+  dataId?: number;
+  title?: string;
   setLayer?: (id: number) => void;
 }
 
-const Pin = (props: PinProps) => {
-  const { id, top, left, height, bgColor, setLayer } = props;
+interface WFCell {
+  id: number;
+  col: number;
+  top: number;
+  left: number;
+  height: number;
+  bgColor: string;
+  dataId?: number;
+  title?: string;
+}
 
+const Pin = (props: PinProps) => {
+  const { id, top, left, height, bgColor, setLayer, dataId, title } = props;
   return (
     <div className='wfc'
       style={{
@@ -24,7 +36,7 @@ const Pin = (props: PinProps) => {
         backgroundColor: bgColor
       }}
     >
-      { id + 'x' }
+      { id + 'x' + dataId + ': ' + title }
     </div>
   );
 };
@@ -38,15 +50,6 @@ const o = {
   // minCol: 0,
   // height: 0,
 };
-
-interface WFCell {
-  id: number,
-  col: number,
-  top: number,
-  left: number,
-  height: number,
-  bgColor: string
-}
 
 type handlePosConfig = {
   cell: WFCell,
@@ -169,7 +172,34 @@ const useStoreStatus = () => {
     toPrevStore,
     toNextStore
   }
-}
+};
+
+const promiseWrap = () => {
+  return new Promise((resolve) => {
+    let xhr = new XMLHttpRequest();
+    xhr.overrideMimeType('application/json');
+    xhr.open('GET', 'https://www.printf520.com:8080/GetType');
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(JSON.parse(xhr.response));
+      }
+    };
+    xhr.send();
+  });
+};
+
+type requestAsyncCallback = (data: any) => void;
+
+const requestAsync = async (callback: requestAsyncCallback) => {
+  let data: any = await promiseWrap();
+
+  if (data.Code === 0) {
+    callback(data.Data);
+  } else {
+    console.log('API request error.');
+    console.log('requestAsync data: ', data);
+  }
+};
 
 const usePageStatus = () => {
   const [pageState, setPageState] = useState({
@@ -191,29 +221,36 @@ const usePageStatus = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
         let tmpGlobalPins = JSON.parse(xhr.response);
 
-        let tmpPins = [];
+        requestAsync((data) => {
+          let tmpPins = [];
+          console.log(data);
 
-        tmpPins = tmpGlobalPins.slice(0, 20);
+          tmpPins = tmpGlobalPins.slice(0, 20);
 
-        let tmpWrapHeight = 0;
-        let tmpHs = [0, 0, 0, 0];
-        tmpPins = tmpPins.map((pin: WFCell) => {
-          const { cell, wrapHeight,  hs } = handlePos({
-            cell: pin,
-            hs: tmpHs
+          let tmpWrapHeight = 0;
+          let tmpHs = [0, 0, 0, 0];
+          tmpPins = tmpPins.map((pin: WFCell, index: number) => {
+            const { cell, wrapHeight,  hs } = handlePos({
+              cell: pin,
+              hs: tmpHs
+            });
+            tmpWrapHeight = wrapHeight;
+            tmpHs = hs;
+            (cell as any).dataId = data[index].id;
+            (cell as any).title = data[index].title;
+            console.log('index: ', index, data[index].id, data[index].title);
+            return cell;
           });
-          tmpWrapHeight = wrapHeight;
-          tmpHs = hs;
-          return cell;
-        });
+          console.log(tmpPins);
 
-        pushStore({
-          wrapHeight: tmpWrapHeight,
-          cols: 4,
-          hs: tmpHs,
-          pins: tmpPins,
-          globalPins: tmpGlobalPins,
-        }, setPageState);
+          pushStore({
+            wrapHeight: tmpWrapHeight,
+            cols: 4,
+            hs: tmpHs,
+            pins: tmpPins,
+            globalPins: tmpGlobalPins,
+          }, setPageState);
+        });
       }
     };
     xhr.send();
@@ -273,11 +310,7 @@ const App = () => {
           pageState.pins.map((pin, index) => {
             return (
               <Pin
-                id={ pin.id }
-                top={ pin.top }
-                left={ pin.left }
-                height={ pin.height }
-                bgColor={ pin.bgColor }
+                { ...pin }
                 key={ index.toString() }
               />
             )
