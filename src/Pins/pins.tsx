@@ -1,6 +1,12 @@
 import * as React from 'react';
 
+import useStoreStatus from './store';
+import useLayerStatus from './layer';
+import { requestTypeAsync } from './request';
+
 const { useState, useEffect } = React;
+
+const IGOIST = 'igoist-moyu';
 
 interface PinProps {
   id: number;
@@ -35,15 +41,17 @@ const Pin = (props: PinProps) => {
         lineHeight: height + 'px',
         backgroundColor: bgColor
       }}
+      onClick={() => setLayer(dataId)}
     >
-      { id + 'x' + dataId + ': ' + title }
+      {/* { id + 'x' + dataId + ': ' + title } */}
+      { title }
     </div>
   );
 };
-
+const WFMultiple = 1;
 const o = {
-  cellWidth: 236,
-  cellSpace: 16,
+  cellWidth: WFMultiple * 59,
+  cellSpace: WFMultiple * 4,
   containerSelectorOffset: 50,
   hibernate: 5000,
   // maxCol: 0,
@@ -104,103 +112,6 @@ const handlePos = (config: handlePosConfig) => {
   }
 };
 
-const useStoreStatus = () => {
-  // default current is equal to storeList.length - 1
-  // and use it as storeState.storeList[storeState.current]
-  const [storeState, setStore] = useState({
-    storeList: [],
-    current: -1
-  });
-
-  const pushStore = (newStore: any, setMethod: (state: any) => void) => {
-    if (storeState.current === storeState.storeList.length - 1) {
-      setStore({
-        storeList: [
-          ...storeState.storeList,
-          newStore
-        ],
-        current: storeState.current + 1
-      });
-    } else {
-      let tmp = storeState.storeList.slice(0, storeState.current + 1);
-
-      setStore({
-        storeList: [
-          ...tmp,
-          newStore
-        ],
-        current: storeState.current + 1
-      });
-    }
-
-    setMethod(newStore);
-  };
-
-  const toPrevStore = (setMethod: (state: any) => void) => {
-    if (storeState.current > 0) {
-      setStore({
-        storeList: storeState.storeList,
-        current: storeState.current - 1
-      });
-
-      setMethod(storeState.storeList[storeState.current - 1]);
-
-      // console.log('toPrevStore: ', storeState.current, storeState.current - 1);
-    } else {
-      console.log('toPrevStore: is at the beginning');
-    }
-  };
-
-  const toNextStore = (setMethod: (state: any) => void) => {
-    if (storeState.current + 1 < storeState.storeList.length) {
-      setStore({
-        storeList: storeState.storeList,
-        current: storeState.current + 1
-      });
-
-      setMethod(storeState.storeList[storeState.current + 1]);
-
-      // console.log('toNextStore: ', storeState.current, storeState.current + 1);
-    } else {
-      console.log('toNextStore: is the latest');
-    }
-  };
-
-  return {
-    storeState,
-    pushStore,
-    toPrevStore,
-    toNextStore
-  }
-};
-
-const promiseWrap = () => {
-  return new Promise((resolve) => {
-    let xhr = new XMLHttpRequest();
-    xhr.overrideMimeType('application/json');
-    xhr.open('GET', 'https://www.printf520.com:8080/GetType');
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        resolve(JSON.parse(xhr.response));
-      }
-    };
-    xhr.send();
-  });
-};
-
-type requestAsyncCallback = (data: any) => void;
-
-const requestAsync = async (callback: requestAsyncCallback) => {
-  let data: any = await promiseWrap();
-
-  if (data.Code === 0) {
-    callback(data.Data);
-  } else {
-    console.log('API request error.');
-    console.log('requestAsync data: ', data);
-  }
-};
-
 const usePageStatus = () => {
   const [pageState, setPageState] = useState({
     wrapHeight: 0,
@@ -212,6 +123,8 @@ const usePageStatus = () => {
 
   const { pushStore, toPrevStore, toNextStore } = useStoreStatus();
 
+  const { layerState, handleDataId, hideLayer } = useLayerStatus();
+
   useEffect(() => {
     console.log('usePageStatus Init');
     let xhr = new XMLHttpRequest();
@@ -221,7 +134,7 @@ const usePageStatus = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
         let tmpGlobalPins = JSON.parse(xhr.response);
 
-        requestAsync((data) => {
+        requestTypeAsync((data) => {
           let tmpPins = [];
           console.log(data);
 
@@ -230,6 +143,7 @@ const usePageStatus = () => {
           let tmpWrapHeight = 0;
           let tmpHs = [0, 0, 0, 0];
           tmpPins = tmpPins.map((pin: WFCell, index: number) => {
+            pin.height = pin.height * WFMultiple / 4;
             const { cell, wrapHeight,  hs } = handlePos({
               cell: pin,
               hs: tmpHs
@@ -276,8 +190,8 @@ const usePageStatus = () => {
     }, setPageState);
   };
 
-  const setLayer = (id: number) => {
-
+  const setLayer = (dataId: number) => {
+    handleDataId(dataId);
   };
 
   const toPrevPage = () => {
@@ -288,16 +202,45 @@ const usePageStatus = () => {
     toNextStore(setPageState);
   }
 
+  const renderLayer = () => {
+    // console.log('layerState.dataId:', layerState.dataId);
+    if (layerState.dataId) {
+      return (
+        <div
+          id={ `${ IGOIST }-layer` }
+          onClick={ hideLayer }
+        >
+          {
+            layerState.data.map((item, index) => {
+              return (
+                <div className={ `${ IGOIST }-item` } key={ index.toString() }>
+                  <a href={ item.url } target='_blank' title={ item.title }>{ item.title }</a>
+                </div>
+              );
+            })
+          }
+        </div>
+      );
+    } else {
+      // return (
+      //   <div>Opps</div>
+      // );
+      return null;
+    }
+  };
+
   return {
     pageState,
     addRandomPin,
+    setLayer,
     toPrevPage,
-    toNextPage
+    toNextPage,
+    renderLayer
   };
 };
 
 const App = () => {
-  const { pageState, addRandomPin, toPrevPage, toNextPage } = usePageStatus();
+  const { pageState, addRandomPin, setLayer, toPrevPage, toNextPage, renderLayer } = usePageStatus();
 
   return (
     <React.Fragment>
@@ -311,6 +254,7 @@ const App = () => {
             return (
               <Pin
                 { ...pin }
+                setLayer={ setLayer }
                 key={ index.toString() }
               />
             )
@@ -318,7 +262,7 @@ const App = () => {
         }
       </div>
 
-      <button
+      {/* <button
         id='addPin'
         onClick={ addRandomPin }
       >AddRandomPin</button>
@@ -329,7 +273,9 @@ const App = () => {
       <button
         id='toNextPage'
         onClick={ toNextPage }
-      >toNextPage</button>
+      >toNextPage</button> */}
+
+      { renderLayer() }
     </React.Fragment>
   );
 }

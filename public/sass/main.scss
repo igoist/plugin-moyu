@@ -1,10 +1,17 @@
 @import 'common';
 
 
+$WFM: 1;
+$WFWWidth: $WFM * 248px;
+$WFCWidth: $WFM * 59px;
+$WFCPadding: $WFM * 4px;
+
 body {
-  width: 100%;
+  position: relative;
+  padding: $WFCPadding $WFCPadding 0 $WFCPadding;
+  width: $WFWWidth + 2 * $WFCPadding;
   height: 100%;
-  // background-color: #333;
+  background-color: #fff;
   cursor: default;
 }
 
@@ -35,25 +42,26 @@ body {
   top: 156px;
 }
 
+
 .waterfall-wrap {
   margin: 0 auto;
   position: relative;
 
   &.cols-4 {
-    width: 992px;
+    width: $WFWWidth;
   }
 
   .wfc {
     position: absolute;
     top: 0;
     left: 0;
-    width: 236px;
-    padding: 0 16px 16px 0;
+    width: $WFCWidth;
+    padding: 0;
     opacity: 0.618;
     border-radius: 4px;
 
     color: #FFF;
-    font-size: 16px;
+    font-size: 12px;
     line-height: 100%;
     text-align: center;
     transition: transform .15s ease-in-out,box-shadow .15s ease-in-out;
@@ -66,3 +74,46 @@ body {
 }
 
 
+
+$IGOIST: 'igoist-moyu';
+
+$minRowHeight: 32px;
+
+##{$IGOIST}-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 0 $WFCPadding;
+  width: $WFWWidth;
+  height: 100%;
+  background-color: #333;
+  overflow-y: scroll;
+  display: grid;
+  grid-auto-rows: minmax($minRowHeight, auto);
+  grid-gap: 0px;
+  text-align: center;
+  box-sizing: content-box;
+
+  .#{$IGOIST}-item {
+    width: $WFWWidth;
+    height: $minRowHeight;
+    line-height: $minRowHeight;
+    background-color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    a {
+      display: inline-block;
+      color: #fff;
+      font-size: 12px;
+    }
+
+    &:hover {
+      a {
+        color: #86c7c7;
+      }
+    }
+  }
+}

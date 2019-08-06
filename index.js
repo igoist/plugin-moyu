@@ -2,12 +2,15 @@ const { app, BrowserWindow, globalShortcut, Tray, Menu, ipcMain, clipboard, nati
 const webpackConfig = require('./webpack/dev');
 const path = require('path');
 
+const WFMultiple = 1;
+const WFWWidth = WFMultiple * 248;
+const WFCPadding = WFMultiple * 4;
 
 function createWindow () {
   // 创建浏览器窗口
   win = new BrowserWindow({
-    width: 1440,
-    height: 876,
+    width: WFWWidth + 2 * WFCPadding,
+    height: 416,
     // file: './index.html'
     nodeIntegration: false,
   });
