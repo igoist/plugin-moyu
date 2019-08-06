@@ -85,25 +85,43 @@ $minRowHeight: 32px;
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 0 $WFCPadding;
-  width: $WFWWidth;
+  padding: $WFCPadding 0;
+  padding-bottom: 0;
+  // padding: 0 $WFCPadding;
+  width: $WFWWidth + 2 * $WFCPadding;
   height: 100%;
   background-color: #333;
   overflow-y: scroll;
   display: grid;
-  grid-auto-rows: minmax($minRowHeight, auto);
+  grid-template-columns: $WFCPadding + 2px  auto $WFCPadding + 2px;
+  // grid-auto-rows: minmax($minRowHeight, auto);
   grid-gap: 0px;
-  text-align: center;
+  text-align: left;
   box-sizing: content-box;
 
+  .#{$IGOIST}-title,
   .#{$IGOIST}-item {
-    width: $WFWWidth;
-    height: $minRowHeight;
     line-height: $minRowHeight;
+    grid-column-start: 2;
+    grid-column-end: 3;
+  }
+
+  .#{$IGOIST}-title {
+    margin-bottom: $WFCPadding;
+    height: $minRowHeight;
+    text-align: center;
+  }
+
+  .#{$IGOIST}-item {
+    border-top: 1px dashed #fff;
+    border-left: 1px dashed #fff;
+    border-right: 1px dashed #fff;
+    padding: $WFCPadding + 2px $WFCPadding + 2px;
+    line-height: 22px;
     background-color: #333;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    // white-space: nowrap;
+    // overflow: hidden;
+    // text-overflow: ellipsis;
 
     a {
       display: inline-block;
@@ -115,6 +133,18 @@ $minRowHeight: 32px;
       a {
         color: #86c7c7;
       }
+    }
+
+    &:nth-child(2) {
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+    }
+
+    &:last-child {
+      margin-bottom: $WFCPadding * 2;
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
+      border-bottom: 1px dashed #fff;
     }
   }
 }

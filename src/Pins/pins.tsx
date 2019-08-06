@@ -8,6 +8,8 @@ const { useState, useEffect } = React;
 
 const IGOIST = 'igoist-moyu';
 
+type setLayerParseType = { dataId: number, title: string };
+
 interface PinProps {
   id: number;
   top: number;
@@ -16,7 +18,7 @@ interface PinProps {
   bgColor: string;
   dataId?: number;
   title?: string;
-  setLayer?: (id: number) => void;
+  setLayer?: (config: setLayerParseType) => void;
 }
 
 interface WFCell {
@@ -41,7 +43,7 @@ const Pin = (props: PinProps) => {
         lineHeight: height + 'px',
         backgroundColor: bgColor
       }}
-      onClick={() => setLayer(dataId)}
+      onClick={() => setLayer({ dataId, title })}
     >
       {/* { id + 'x' + dataId + ': ' + title } */}
       { title }
@@ -123,7 +125,7 @@ const usePageStatus = () => {
 
   const { pushStore, toPrevStore, toNextStore } = useStoreStatus();
 
-  const { layerState, handleDataId, hideLayer } = useLayerStatus();
+  const { layerState, handleLayer, hideLayer } = useLayerStatus();
 
   useEffect(() => {
     console.log('usePageStatus Init');
@@ -194,8 +196,8 @@ const usePageStatus = () => {
     }, setPageState);
   };
 
-  const setLayer = (dataId: number) => {
-    handleDataId(dataId);
+  const setLayer = (config: setLayerParseType) => {
+    handleLayer(config);
   };
 
   const toPrevPage = () => {
@@ -214,6 +216,9 @@ const usePageStatus = () => {
           id={ `${ IGOIST }-layer` }
           onClick={ hideLayer }
         >
+          <div className={ `${ IGOIST }-title` }>
+            { layerState.title }
+          </div>
           {
             layerState.data.map((item, index) => {
               return (

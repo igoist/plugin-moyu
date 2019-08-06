@@ -5,10 +5,13 @@ import { requestListAsync } from './request';
 
 const { useState, useEffect } = React;
 
+type setLayerParseType = { dataId: number, title: string };
+
 const useLayerStatus = () => {
   const [layerState, setLayerState] = useState({
     dataId: null,
-    data: []
+    data: [],
+    title: ''
   });
 
   const { pushStore, toPrevStore, toNextStore } = useStoreStatus();
@@ -18,13 +21,15 @@ const useLayerStatus = () => {
     pushStore(layerState, setLayerState);
   }, []);
 
-  const handleDataId = async (dataId: number) => {
+  const handleLayer = async (config: setLayerParseType) => {
+    const { dataId, title } = config;
     requestListAsync(dataId, (data) => {
       console.log('Id: ', dataId, data);
 
       pushStore({
         dataId: dataId,
-        data
+        data,
+        title
       }, setLayerState);
     });
   };
@@ -39,7 +44,7 @@ const useLayerStatus = () => {
 
   return {
     layerState,
-    handleDataId,
+    handleLayer,
     hideLayer,
     reopenLayer,
   }
