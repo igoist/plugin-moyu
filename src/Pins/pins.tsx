@@ -129,7 +129,11 @@ const usePageStatus = () => {
     console.log('usePageStatus Init');
     let xhr = new XMLHttpRequest();
     xhr.overrideMimeType('application/json');
-    xhr.open('GET', '/map/map-pins.json');
+    if (process.env.NODE_ENV === 'development') {
+      xhr.open('GET', '/map/map-pins.json');
+    } else if (process.env.NODE_ENV === 'production') {
+      xhr.open('GET', './map/map-pins.json');
+    }
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
         let tmpGlobalPins = JSON.parse(xhr.response);

@@ -1,7 +1,7 @@
 const merge = require('webpack-merge');
 const common = require('./common.js');
 const webpack = require('webpack');
-
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 // const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const path = require('path');
 const publicPath = './';
@@ -9,12 +9,19 @@ const publicPath = './';
 module.exports = merge(common, {
   // devtool: 'inline-source-map',
   mode: 'production',
+  externals: {
+    'react': 'React',
+    'react-dom': 'ReactDOM',
+  },
   output: {
     filename: '[name].[chunkhash:8].js',
     path: path.resolve(path.resolve(__dirname, '..'), 'dist/'),
     publicPath
   },
   plugins: [
+    new HtmlWebpackPlugin({
+      template: path.resolve(path.resolve(__dirname, '..'), './public/index.html')
+    }),
     // new UglifyJSPlugin({
     //   sourceMap: true,
     //   parallel: true
