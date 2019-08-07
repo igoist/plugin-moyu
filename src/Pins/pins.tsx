@@ -211,29 +211,37 @@ const usePageStatus = () => {
   const renderLayer = () => {
     // console.log('layerState.dataId:', layerState.dataId);
     if (layerState.dataId) {
-      return (
-        <div
-          id={ `${ IGOIST }-layer` }
-          onClick={ hideLayer }
-        >
-          <div className={ `${ IGOIST }-title` }>
-            { layerState.title }
+      if (layerState.data) {
+        return (
+          <div
+            id={ `${ IGOIST }-layer` }
+            onClick={ hideLayer }
+          >
+            <div className={ `${ IGOIST }-title` }>
+              { layerState.title }
+            </div>
+            {
+              layerState.data.map((item, index) => {
+                return (
+                  <div className={ `${ IGOIST }-item` } key={ index.toString() }>
+                    <a href={ item.url } target='_blank' title={ item.title }>{ item.title }</a>
+                  </div>
+                );
+              })
+            }
           </div>
-          {
-            layerState.data.map((item, index) => {
-              return (
-                <div className={ `${ IGOIST }-item` } key={ index.toString() }>
-                  <a href={ item.url } target='_blank' title={ item.title }>{ item.title }</a>
-                </div>
-              );
-            })
-          }
-        </div>
-      );
+        );
+      } else {
+        return (
+          <div
+            id={ `${ IGOIST }-layer` }
+            onClick={ hideLayer }
+          >
+            <div className={ `${ IGOIST }-title` }>Opps!</div>
+          </div>
+        );
+      }
     } else {
-      // return (
-      //   <div>Opps</div>
-      // );
       return null;
     }
   };
