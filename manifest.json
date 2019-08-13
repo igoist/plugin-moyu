@@ -1,0 +1,34 @@
+{
+  "name": "moyu",
+  "description": "moyu time",
+  "version": "0.0.1",
+  "background": {
+    "scripts": ["src/background.js"],
+    "persistent": false
+  },
+  "icons": {
+    "32": "public/img/32.ico",
+    "48": "public/img/icon.png",
+    "128": "public/img/128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "run_at": "document_end",
+      "js": ["dist/b.js"]
+    }
+  ],
+  "manifest_version": 2,
+  "browser_action": {
+    "default_icon": "public/img/128.png",
+    "default_title": "摸鱼看热点",
+    "default_popup": "dist/index.html"
+  },
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "declarativeContent",
+    "webNavigation", "*://*/*"
+  ]
+}

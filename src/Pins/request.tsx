@@ -1,5 +1,7 @@
 const baseUrl = 'https://www.printf520.com:8080/GetType';
 
+declare var chrome: any;
+
 const promiseWrap = (url: string) => {
   // return new Promise((resolve) => {
   //   let xhr = new XMLHttpRequest();
@@ -20,26 +22,44 @@ const promiseWrap = (url: string) => {
 type requestAsyncCallback = (data: any) => void;
 
 export const requestTypeAsync = async (callback: requestAsyncCallback) => {
-  console.time('requestTypeAsyncTime');
-  let data: any = await promiseWrap(baseUrl);
-  console.timeEnd('requestTypeAsyncTime');
+  if (process.env.NODE_ENV === 'development') {
+    let data: any = await promiseWrap(baseUrl);
 
-  if (data.Code === 0) {
-    callback(data.Data);
-  } else {
-    console.log('API request error.');
-    console.log('requestAsync data: ', data);
+    if (data.Code === 0) {
+      callback(data.Data);
+    } else {
+      console.log('API request error.');
+      console.log('requestAsync data: ', data);
+    }
   }
+  if (process.env.NODE_ENV === 'production') {
+    chrome.runtime.sendMessage({ msg: 'requestTypeAsync' }, function(res: any) {
+      if (res) {
+        console.log('get response: ', res);
+        callback(res);
+      }
+    });
+  }
+
 };
 
 export const requestListAsync = async (dataId: number, callback: requestAsyncCallback) => {
-  let data: any = await promiseWrap(`${ baseUrl }Info?id=${ dataId }`);
+  if (process.env.NODE_ENV === 'development') {
+    let data: any = await promiseWrap(`${ baseUrl }Info?id=${ dataId }`);
 
-  if (data.Code === 0) {
-    callback(data.Data);
-  } else {
-    console.log('API request error.');
-    console.log('requestAsync data: ', data);
+    if (data.Code === 0) {
+      callback(data.Data);
+    } else {
+      console.log('API request error.');
+      console.log('requestAsync data: ', data);
+    }
+  }
+  if (process.env.NODE_ENV === 'production') {
+    chrome.runtime.sendMessage({ msg: 'requestListAsync', dataId }, function(res: any) {
+      if (res) {
+        callback(res);
+      }
+    });
   }
 };
 
