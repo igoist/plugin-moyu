@@ -2,6 +2,8 @@ import * as React from 'react';
 
 const { useState } = React;
 
+type setMethodType = (state: any) => void;
+
 const useStoreStatus = () => {
   // default current is equal to storeList.length - 1
   // and use it as storeState.storeList[storeState.current]
@@ -10,7 +12,7 @@ const useStoreStatus = () => {
     current: -1
   });
 
-  const pushStore = (newStore: any, setMethod: (state: any) => void) => {
+  const pushStore = (newStore: any, setMethod: setMethodType) => {
     if (storeState.current === storeState.storeList.length - 1) {
       setStore({
         storeList: [
@@ -34,7 +36,7 @@ const useStoreStatus = () => {
     setMethod(newStore);
   };
 
-  const toPrevStore = (setMethod: (state: any) => void) => {
+  const toPrevStore = (setMethod: setMethodType) => {
     if (storeState.current > 0) {
       setStore({
         storeList: storeState.storeList,
@@ -49,7 +51,7 @@ const useStoreStatus = () => {
     }
   };
 
-  const toNextStore = (setMethod: (state: any) => void) => {
+  const toNextStore = (setMethod: setMethodType) => {
     if (storeState.current + 1 < storeState.storeList.length) {
       setStore({
         storeList: storeState.storeList,

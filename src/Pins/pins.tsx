@@ -10,16 +10,7 @@ const IGOIST = 'igoist-moyu';
 
 type setLayerParseType = { dataId: number, title: string };
 
-interface PinProps {
-  id: number;
-  top: number;
-  left: number;
-  height: number;
-  bgColor: string;
-  dataId?: number;
-  title?: string;
-  setLayer?: (config: setLayerParseType) => void;
-}
+
 
 interface WFCell {
   id: number;
@@ -30,6 +21,10 @@ interface WFCell {
   bgColor: string;
   dataId?: number;
   title?: string;
+}
+
+interface PinProps extends WFCell {
+  setLayer?: (config: setLayerParseType) => void;
 }
 
 const Pin = (props: PinProps) => {
@@ -115,6 +110,7 @@ const handlePos = (config: handlePosConfig) => {
 };
 
 const usePageStatus = () => {
+  const [loading, setLoading] = useState(true);
   const [pageState, setPageState] = useState({
     wrapHeight: 0,
     cols: 4,
@@ -162,7 +158,9 @@ const usePageStatus = () => {
             return cell;
           });
           console.log(tmpPins);
-
+          setTimeout(() => {
+            setLoading(false);
+          }, 500);
           pushStore({
             wrapHeight: tmpWrapHeight,
             cols: 4,
@@ -208,6 +206,50 @@ const usePageStatus = () => {
     toNextStore(setPageState);
   }
 
+  const renderPins = () => {
+    if (loading) {
+      return <div className='loader'></div>
+    }
+    return (
+      <div className={ `waterfall-wrap cols-${ pageState.cols }` }
+        style={{
+          height: pageState.wrapHeight
+        }}
+      >
+        {
+          pageState.pins.map((pin, index) => {
+            return (
+              <Pin
+                { ...pin }
+                setLayer={ setLayer }
+                key={ index.toString() }
+              />
+            )
+          })
+        }
+      </div>
+    );
+  };
+
+  const renderControls = () => {
+    return (
+      <div>
+        <button
+          id='addPin'
+          onClick={ addRandomPin }
+        >AddRandomPin</button>
+        <button
+          id='toPrevPage'
+          onClick={ toPrevPage }
+        >toPrevPage</button>
+        <button
+          id='toNextPage'
+          onClick={ toNextPage }
+        >toNextPage</button>
+      </div>
+    );
+  };
+
   const renderLayer = () => {
     // console.log('layerState.dataId:', layerState.dataId);
     if (layerState.dataId) {
@@ -252,46 +294,19 @@ const usePageStatus = () => {
     setLayer,
     toPrevPage,
     toNextPage,
+    renderPins,
+    renderControls,
     renderLayer
   };
 };
 
 const App = () => {
-  const { pageState, addRandomPin, setLayer, toPrevPage, toNextPage, renderLayer } = usePageStatus();
+  const { renderPins, renderControls, renderLayer } = usePageStatus();
 
   return (
     <React.Fragment>
-      <div className={ `waterfall-wrap cols-${ pageState.cols }` }
-        style={{
-          height: pageState.wrapHeight
-        }}
-      >
-        {
-          pageState.pins.map((pin, index) => {
-            return (
-              <Pin
-                { ...pin }
-                setLayer={ setLayer }
-                key={ index.toString() }
-              />
-            )
-          })
-        }
-      </div>
-
-      {/* <button
-        id='addPin'
-        onClick={ addRandomPin }
-      >AddRandomPin</button>
-      <button
-        id='toPrevPage'
-        onClick={ toPrevPage }
-      >toPrevPage</button>
-      <button
-        id='toNextPage'
-        onClick={ toNextPage }
-      >toNextPage</button> */}
-
+      { renderPins() }
+      {/* { renderControls() } */}
       { renderLayer() }
     </React.Fragment>
   );

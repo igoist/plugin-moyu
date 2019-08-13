@@ -65,6 +65,7 @@ body {
     line-height: 100%;
     text-align: center;
     transition: transform .15s ease-in-out,box-shadow .15s ease-in-out;
+    user-select: none;
 
     &:hover {
       box-shadow: 0 1px 3px rgba(0,0,0,.02), 0 16px 32px -4px rgba(0,0,0,.17);
