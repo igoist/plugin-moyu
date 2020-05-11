@@ -1,4 +1,4 @@
-const baseUrl = 'https://www.printf520.com:8080/GetType';
+const baseUrl = 'http://localhost:6085';
 
 declare var chrome: any;
 
@@ -29,7 +29,7 @@ export const requestTypeAsync = async (callback: requestAsyncCallback) => {
       callback(data.Data);
     } else {
       console.log('API request error.');
-      console.log('requestAsync data: ', data);
+      console.log('requestAsync data: ', data, data.Data);
     }
   }
   if (process.env.NODE_ENV === 'production') {
@@ -45,10 +45,10 @@ export const requestTypeAsync = async (callback: requestAsyncCallback) => {
 
 export const requestListAsync = async (dataId: number, callback: requestAsyncCallback) => {
   if (process.env.NODE_ENV === 'development') {
-    let data: any = await promiseWrap(`${ baseUrl }Info?id=${ dataId }`);
+    let data: any = await promiseWrap(`${ baseUrl }/api/v1/list/${ dataId }`);
 
     if (data.Code === 0) {
-      callback(data.Data);
+      callback(data.list);
     } else {
       console.log('API request error.');
       console.log('requestAsync data: ', data);

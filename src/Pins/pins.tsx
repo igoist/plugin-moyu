@@ -135,12 +135,10 @@ const usePageStatus = () => {
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
         let tmpGlobalPins = JSON.parse(xhr.response);
-
         requestTypeAsync((data) => {
           let tmpPins = [];
-          console.log(data);
 
-          tmpPins = tmpGlobalPins.slice(0, 20);
+          tmpPins = tmpGlobalPins.slice(0, data.length < 20 ? data.length: 20);
 
           let tmpWrapHeight = 0;
           let tmpHs = [0, 0, 0, 0];
@@ -250,14 +248,21 @@ const usePageStatus = () => {
     );
   };
 
+  const handleLayerItemClick = (e: any) => {
+    if (e.target && e.target.tagName.toLowerCase() === 'a') {
+      return ;
+    }
+    hideLayer();
+  };
+
   const renderLayer = () => {
     // console.log('layerState.dataId:', layerState.dataId);
-    if (layerState.dataId) {
+    if (layerState.dataId !== undefined && layerState.dataId !== null) {
       if (layerState.data) {
         return (
           <div
             id={ `${ IGOIST }-layer` }
-            onClick={ hideLayer }
+            onClick={ handleLayerItemClick }
           >
             <div className={ `${ IGOIST }-title` }>
               { layerState.title }
@@ -266,7 +271,7 @@ const usePageStatus = () => {
               layerState.data.map((item, index) => {
                 return (
                   <div className={ `${ IGOIST }-item` } key={ index.toString() }>
-                    <a href={ item.url } target='_blank' title={ item.title }>{ item.title }</a>
+                    <a href={ item.link } target='_blank' title={ item.title }>{ item.title }</a>
                   </div>
                 );
               })

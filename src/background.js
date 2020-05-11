@@ -1,4 +1,4 @@
-const baseUrl = 'https://www.printf520.com:8080/GetType';
+const baseUrl = 'http://localhost:6085';
 const timeDelta = 2000 * 1000;
 
 let types = {
@@ -34,10 +34,10 @@ const requestTypeAsync = async (callback) => {
 };
 
 const requestListAsync = async (dataId, callback) => {
-  let data = await promiseWrap(`${ baseUrl }Info?id=${ dataId }`);
+  let data = await promiseWrap(`${ baseUrl }/api/v1/list/${ dataId }`);
 
   if (data.Code === 0) {
-    callback(data.Data);
+    callback(data.list);
   } else {
     console.log('BG API request error.');
     console.log('BG requestAsync data: ', data);
