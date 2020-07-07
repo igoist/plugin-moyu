@@ -14,7 +14,7 @@
   "author": "igoist",
   "license": "MIT",
   "dependencies": {
-    "electron": "^5.0.4",
+    "electron": "^9.1.0",
     "koa": "^2.11.0",
     "koa-cors": "0.0.16",
     "koa-router": "^8.0.8",
